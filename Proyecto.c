@@ -11,7 +11,7 @@ int main(void) {
 	char readbuffer[55]; 
         char command[50];
 
-	pipe(fd);
+	pipe(fd); // crea tuberia
 
 	if((pid = fork()) == -1) {
 		perror("fork");
@@ -21,22 +21,22 @@ int main(void) {
 	if(pid) {
 		close(fd[0]);
 		while(1){
-			fgets(string, 50, stdin);
+			fgets(string, 50, stdin); // lee comando
 			
-			if(strcmp(string, "salir\n")==0){
+			if(strcmp(string, "salir\n")==0){ // si el comando es "salir" termina proceso padre
 				break;
 			}else{
-				write(fd[1], string, strlen(string)+1);
+				write(fd[1], string, strlen(string)+1); // envia comando a hijo
 			}
 		}
-		kill(pid, SIGKILL);
+		kill(pid, SIGKILL); // terminar proceso hijo
 		
 			
 	} else {
 		close(fd[1]);
 		while(1){
-			read(fd[0], readbuffer, sizeof(readbuffer));
-			system(readbuffer);
+			read(fd[0], readbuffer, sizeof(readbuffer)); // recibe comando
+			system(readbuffer); // ejecuta comando
 		}
 		exit(EXIT_SUCCESS);
 	
