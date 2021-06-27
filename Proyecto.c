@@ -7,8 +7,8 @@
 int main(void) {
 	int fd[2];
 	pid_t pid;
-	char string[51];// 21
-	char readbuffer[55]; // 25
+	char string[51];
+	char readbuffer[55]; 
         char command[50];
 
 	pipe(fd);
