@@ -30,7 +30,7 @@ int main(void) {
 			if(strcmp(string, "salir\n")==0){ // si el comando es "salir" termina proceso padre
 				break;
 			}else{
-				write(fd[1], string, strlen(string)); // envia comando a hijo
+				write(fd[1], string, strlen(string) +1); // envia comando a hijo
 			}
 			
 		}
