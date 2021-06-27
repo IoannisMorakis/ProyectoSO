@@ -23,11 +23,16 @@ int main(void) {
 		while(1){
 			fgets(string, 50, stdin); // lee comando
 			
+			// funcion que detecta sie es un comado valido aqui
+			
+			// si no es un comando valido imprimir "Comando invalido" y seguir al siguiente comando
+			//y si es valido ejecuta esto:
 			if(strcmp(string, "salir\n")==0){ // si el comando es "salir" termina proceso padre
 				break;
 			}else{
 				write(fd[1], string, strlen(string)+1); // envia comando a hijo
 			}
+			
 		}
 		kill(pid, SIGKILL); // terminar proceso hijo
 		
