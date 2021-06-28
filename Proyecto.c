@@ -21,7 +21,7 @@ int main(void) {
 	if(pid) {
 		close(fd[0]);
 		while(1){
-			fgets(string, 21, stdin); // lee comando
+			fgets(string, 20, stdin); // lee comando
 			
 			// funcion que detecta sie es un comado valido aqui
 			
