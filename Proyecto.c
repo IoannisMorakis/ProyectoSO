@@ -7,9 +7,8 @@
 int main(void) {
 	int fd[2];
 	pid_t pid;
-	char string[21];
-	char readbuffer[25]; 
-        char command[50];
+	char string[22];
+	char readbuffer[26]; 
 
 	pipe(fd); // crea tuberia
 
@@ -21,7 +20,7 @@ int main(void) {
 	if(pid) {
 		close(fd[0]);
 		while(1){
-			fgets(string, 20, stdin); // lee comando
+			fgets(string, 21, stdin); // lee comando
 			
 			// funcion que detecta sie es un comado valido aqui
 			
