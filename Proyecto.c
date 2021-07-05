@@ -29,8 +29,8 @@ int main(void) {
 			// funcion que detecta sie es un comado valido aqui
 
 			// si no es un comando valido imprimir "Comando invalido" y seguir al siguiente comando
+			
 			//y si es valido ejecuta esto:
-
 			if(strcmp(string, "salir\n")==0){
 				kill(pid, SIGKILL);
 				break;
@@ -45,13 +45,13 @@ int main(void) {
 				read(fd[0], readbuffer, sizeof(readbuffer));
 				
 				char *arg[] = {
-					"sh", 
-					"-c",
-					readbuffer, 
+					"sh", //El comando 'sh' invoca al shell
+					"-c", // La bandera '-c' le indica al programa que vas a pasar comandos 
+					readbuffer, // los comandos a ejecutar
 					NULL
 				};
 
-				execvp(arg[0], arg);
+				execvp(arg[0], arg); // reemplaza el proceso hijo actual con el comando a ejecutar
 
 		
 		}
