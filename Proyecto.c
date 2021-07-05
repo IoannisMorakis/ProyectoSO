@@ -16,7 +16,6 @@ int main(void) {
 		fd=(int*) calloc(2, sizeof(int));
 		pipe(fd); // crea tuberia
 		
-		
 		if((pid = fork()) == -1) {
 			perror("fork");
 			exit(EXIT_FAILURE);
@@ -33,14 +32,12 @@ int main(void) {
 			//y si es valido ejecuta esto:
 
 			if(strcmp(string, "salir\n")==0){
-				//printf("salir\n");
 				kill(pid, SIGKILL);
 				break;
 			}else{
 				write(fd[1], string, strlen(string) + 1 );
 			}
 			
-			//kill(pid, SIGKILL);
 			wait(NULL);
 				
 		} else { // Child
