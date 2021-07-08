@@ -16,6 +16,7 @@ int main(void) {
 	char readbuffer[26]; 
         
 
+
 	while(1){
 		fd=(int*) calloc(2, sizeof(int));
 		pipe(fd); // crea tuberia
@@ -30,6 +31,7 @@ int main(void) {
 			
 				
 			fgets(string, 20, stdin);
+
 			
 			if(strcmp(string, "salir\n")==0){ // termina programa
 				
@@ -38,6 +40,7 @@ int main(void) {
 			}else{
 				write(fd[1], string, strlen(string) + 1 ); // manda comando
 			}
+			
 			
 			wait(NULL);
 				
@@ -59,33 +62,36 @@ int main(void) {
 			int oper=0;
 			char *str1;
 			char *str2;
+			char *nstr2 = malloc(sizeof(char) * 20);
 			//
 
 			//
-			// detecta operacion
-			str2= strstr(nstr, "&&");
+			//detecta operacion
+			strcpy(nstr2,nstr);
+			str2= strstr(nstr2, "&&");
 			if(str2!=NULL){
 				oper=1;
 				str1= strtok(nstr, "&&");
 
-			}
-			str2= strstr(nstr, "||");
-			if(str2!=NULL){
-				oper=2;
-				str1= strtok(nstr, "||");
 			}else{
-				str2= strstr(nstr, "|");
+		
+				str2= strstr(nstr2, "||");
 				if(str2!=NULL){
-					oper=3;
-					str1= strtok(nstr, "|");
+					oper=2;
+					str1= strtok(nstr, "||");
+				}else{
+					str2= strstr(nstr2, "|");
+					if(str2!=NULL){
+						oper=3;
+						str1= strtok(nstr, "|");
+					}
 				}
 			}
-			
 			if(oper==0){ strcpy(str1, nstr); }
 			//
 			
 			//
-			pid_t pid2;
+			
 
 			int i=0;
 			char *token = strtok(str1, " ");
@@ -97,13 +103,16 @@ int main(void) {
 			}
 
 			
+			//
 			if(oper==0){
 				if(execvp(arg[0], arg)==-1){printf( "error\n");}
 
 			}
 			else{
-		
-				int j, cont;
+
+				//
+				pid_t pid2;
+				int j, cont; 
 				
 				if(oper==1){
 					pid2 = fork();
@@ -122,8 +131,11 @@ int main(void) {
 							j++;	
 						}
 						cont =j;
+						
 						while( j<i ) {
 							arg[j]= (char *) calloc(20, sizeof(char));
+							
+							arg[j]= 0x00;
 							j++;	
 						}
 						//
@@ -148,6 +160,7 @@ int main(void) {
 					cont =j;
 					while( j<i ) {
 						arg[j]= (char *) calloc(20, sizeof(char));
+						arg[j]= 0x00;
 						j++;	
 					}
 					//
@@ -186,28 +199,22 @@ int main(void) {
 					
 					while( j<i ) {
 						arg[j]= (char *) calloc(20, sizeof(char));
+						arg[j]= 0x00;
 						j++;	
 					}
 					//
 					
 					dup2(sfd, STDOUT_FILENO);
 					
-					
-				
-					
 				}
 				
-				
-
 			}
 			//
-			
 			
 			
 			exit(EXIT_SUCCESS);
 		
 		}
-
 	}
 	exit(EXIT_SUCCESS);
 }
