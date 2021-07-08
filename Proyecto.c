@@ -2,15 +2,19 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #include <sys/wait.h>
+/* #include <sys/types.h> */
+
+
+
 
 int main(void) {
 	int *fd;
 	pid_t pid;
-	char string[52];
-	char readbuffer[56]; 
-        char command[50];
-
+	char string[22];
+	char readbuffer[26]; 
+        
 
 	while(1){
 		fd=(int*) calloc(2, sizeof(int));
@@ -24,37 +28,186 @@ int main(void) {
 		if(pid) { // Parent
 			close(fd[0]);
 			
-			fgets(string, 51, stdin);
-
-			// funcion que detecta sie es un comado valido aqui
-
-			// si no es un comando valido imprimir "Comando invalido" y seguir al siguiente comando
+				
+			fgets(string, 20, stdin);
 			
-			//y si es valido ejecuta esto:
-			if(strcmp(string, "salir\n")==0){
+			if(strcmp(string, "salir\n")==0){ // termina programa
+				
 				kill(pid, SIGKILL);
 				break;
 			}else{
-				write(fd[1], string, strlen(string) + 1 );
+				write(fd[1], string, strlen(string) + 1 ); // manda comando
 			}
 			
 			wait(NULL);
 				
 		} else { // Child
 			close(fd[1]);
-				read(fd[0], readbuffer, sizeof(readbuffer));
+
+			read(fd[0], readbuffer, sizeof(readbuffer));
+			
+			char *nstr= strtok(readbuffer, "\n");
+
+			//
+			
+			char *arg[21]={
+				NULL, NULL
 				
-				char *arg[] = {
-					"sh", //El comando 'sh' invoca al shell
-					"-c", // La bandera '-c' le indica al programa que vas a pasar comandos 
-					readbuffer, // los comandos a ejecutar
-					NULL
-				};
+			};
+			
+			
+			int oper=0;
+			char *str1;
+			char *str2;
+			//
 
-				execvp(arg[0], arg); // reemplaza el proceso hijo actual con el comando a ejecutar
+			//
+			// detecta operacion
+			str2= strstr(nstr, "&&");
+			if(str2!=NULL){
+				oper=1;
+				str1= strtok(nstr, "&&");
 
+			}
+			str2= strstr(nstr, "||");
+			if(str2!=NULL){
+				oper=2;
+				str1= strtok(nstr, "||");
+			}else{
+				str2= strstr(nstr, "|");
+				if(str2!=NULL){
+					oper=3;
+					str1= strtok(nstr, "|");
+				}
+			}
+			
+			if(oper==0){ strcpy(str1, nstr); }
+			//
+			
+			//
+			pid_t pid2;
+
+			int i=0;
+			char *token = strtok(str1, " ");
+			while( token != NULL ) {
+				arg[i]= (char *) malloc(20);
+				strcpy(arg[i], token);
+				token = strtok(NULL, " ");
+				i++;
+			}
+
+			
+			if(oper==0){
+				if(execvp(arg[0], arg)==-1){printf( "error\n");}
+
+			}
+			else{
+		
+				int j, cont;
+				
+				if(oper==1){
+					pid2 = fork();
+					if(pid2){
+						if(execvp(arg[0], arg)==-1){printf( "error\n"); kill(pid2, SIGKILL);}	
+					}
+					else{
+						//
+						j=0;
+						token = strtok(str2, " ");
+						token = strtok(NULL, " ");
+						while( token != NULL ) {
+							arg[j]= (char *) calloc(20, sizeof(char));
+							strcpy(arg[j], token);
+							token = strtok(NULL, " ");
+							j++;	
+						}
+						cont =j;
+						while( j<i ) {
+							arg[j]= (char *) calloc(20, sizeof(char));
+							j++;	
+						}
+						//
+						
+						if(execvp(arg[0], arg)==-1){printf( "error\n");}
+					}
+
+				}
+				else if(oper==2){
+					if(execvp(arg[0], arg)==-1){printf( "error\n"); }
+
+					//
+					j=0;
+					token = strtok(str2, " ");
+					token = strtok(NULL, " ");
+					while( token != NULL ) {
+						arg[j]= (char *) calloc(20, sizeof(char));
+						strcpy(arg[j], token);
+						token = strtok(NULL, " ");
+						j++;	
+					}
+					cont =j;
+					while( j<i ) {
+						arg[j]= (char *) calloc(20, sizeof(char));
+						j++;	
+					}
+					//
+					
+					if(execvp(arg[0], arg)==-1){printf( "error\n"); }
+
+				}else{
+					
+					int sfd;
+					int rfd= open ("pipe",O_CREAT| O_TRUNC |O_RDWR, S_IRWXU);
+					
+					sfd= dup(STDOUT_FILENO);
+					if(dup2(rfd, STDOUT_FILENO)== -1) {printf("error\n");}
+					close(rfd);
+
+					pid2 = fork();
+					if(!pid2){
+						if(execvp(arg[0], arg)==-1){printf( "error\n"); exit(EXIT_FAILURE);}	
+					}
+					wait(NULL);
+
+					//
+					j=0;
+					token = strtok(str2, " ");
+					token = strtok(NULL, " ");
+					while( token != NULL ) {
+						arg[j]= (char *) calloc(20, sizeof(char));
+						strcpy(arg[j], token);
+						token = strtok(NULL, " ");
+						j++;	
+					}
+					cont =j;
+					arg[j]= (char *) calloc(20, sizeof(char));
+					strcpy(arg[j], "pipe");
+					j++;
+					
+					while( j<i ) {
+						arg[j]= (char *) calloc(20, sizeof(char));
+						j++;	
+					}
+					//
+					
+					dup2(sfd, STDOUT_FILENO);
+					
+					
+				
+					
+				}
+				
+				
+
+			}
+			//
+			
+			
+			
+			exit(EXIT_SUCCESS);
 		
 		}
+
 	}
 	exit(EXIT_SUCCESS);
 }
