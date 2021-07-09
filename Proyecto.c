@@ -205,7 +205,7 @@ int main(void) {
 					//
 					
 					dup2(sfd, STDOUT_FILENO);
-					
+					if(execvp(arg[0], arg)==-1){printf( "error\n"); exit(EXIT_FAILURE);}
 				}
 				
 			}
