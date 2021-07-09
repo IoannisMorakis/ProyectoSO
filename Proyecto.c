@@ -17,7 +17,7 @@ int main(void) {
 		fd=(int*) calloc(2, sizeof(int));
 		pipe(fd); // crea tuberia
 		
-		if((pid = fork()) == -1) {
+		if((pid = fork()) == -1) { // Crea otro procesos
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
@@ -46,7 +46,7 @@ int main(void) {
 
 			read(fd[0], readbuffer, sizeof(readbuffer)); // recibe comando
 			
-			char *nstr= strtok(readbuffer, "\n");
+			char *nstr= strtok(readbuffer, "\n"); //
 			
 			//
 			
@@ -63,33 +63,33 @@ int main(void) {
 			//
 
 			//
-			//detecta operacion y si encuentra una operacion separa los comandos en dos strings diferentes
+			//detecta operador y si encuentra un operador separa los comandos en dos strings diferentes
 			strcpy(nstr2,nstr);
-			str2= strstr(nstr2, "&&");
+			str2= strstr(nstr2, "&&"); // encuentra operador "and"
 			if(str2!=NULL){ 
 				oper=1;
 				str1= strtok(nstr, "&&");
 
 			}else{
 		
-				str2= strstr(nstr2, "||");
+				str2= strstr(nstr2, "||"); // encuentra operador "or"
 				if(str2!=NULL){
 					oper=2;
 					str1= strtok(nstr, "||");
 				}else{
-					str2= strstr(nstr2, "|");
+					str2= strstr(nstr2, "|"); // encuentra operador de tuberia
 					if(str2!=NULL){
 						oper=3;
 						str1= strtok(nstr, "|");
 					}
 				}
 			}
-			if(oper==0){ strcpy(str1, nstr); } // si no ecuentra
+			if(oper==0){ strcpy(str1, nstr); } // si no ecuentra una operador se copia el comando completo en un solo string 
 			//
 			
 			//
-			
-
+			// Para ejecutar execvp() se necesita un arreglo de strings que contenga el nombre del programa y los argumentos del comando
+			// Asi que se separa la linea de comando en varias palabras y cada palabra se guarda en un arreglo de strings
 			int i=0;
 			char *token = strtok(str1, " ");
 			while( token != NULL ) {
@@ -100,8 +100,9 @@ int main(void) {
 			}
 			
 			
+			
 			//
-			if(oper==0){
+			if(oper==0){ // si no hay un operado ejecutar el comando
 				if(execvp(arg[0], arg)==-1){printf( "error\n");}
 
 			}
@@ -110,13 +111,17 @@ int main(void) {
 				pid_t pid2;
 				int j, cont; 
 				
-				if(oper==1){
-					pid2 = fork();
-					if(pid2){
+				if(oper==1){ // Para el operador "and"
+					
+					
+					pid2 = fork(); // Crea otro proceso
+					if(pid2){ 
+						// primer proceso hijo ejecuta el primer comando
 						if(execvp(arg[0], arg)==-1){printf( "error\n"); kill(pid2, SIGKILL);}	
 					}
 					else{
 						//
+						// guarda cada palabra del segundo comando en el areglo de string
 						j=0;
 						token = strtok(str2, " ");
 						token = strtok(NULL, " ");
@@ -128,21 +133,25 @@ int main(void) {
 						}
 						cont =j;
 						
-						while( j<i ) {
+						// si el segundo comando tiene menos argumentos que el primero 
+						// establece el resto de los elementos del arreglo como vacios
+						while( j<i ) { 
 							arg[j]= (char *) calloc(20, sizeof(char));
 							arg[j]= 0x00;
 							j++;	
 						}
 						//
 						
+						// segundo proceso hijo ejecuta el segundo comando
 						if(execvp(arg[0], arg)==-1){printf( "error\n");}
 					}
 
 				}
-				else if(oper==2){
+				else if(oper==2){ // Para el operador "or"
 					if(execvp(arg[0], arg)==-1){printf( "error\n"); }
 					
 					//
+					// si el prime comando fallo elecutar el segundo
 					j=0;
 					token = strtok(str2, " ");
 					token = strtok(NULL, " ");
@@ -153,6 +162,8 @@ int main(void) {
 						j++;	
 					}
 					cont =j;
+					
+					// Limpiar arreglo de strings
 					while( j<i ) {
 						arg[j]= (char *) calloc(20, sizeof(char));
 						arg[j]= 0x00;
