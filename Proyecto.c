@@ -152,6 +152,7 @@ int main(void) {
 					
 					//
 					// si el prime comando fallo elecutar el segundo
+					// guarda cada palabra del segundo comando en el areglo de string
 					j=0;
 					token = strtok(str2, " ");
 					token = strtok(NULL, " ");
@@ -163,7 +164,7 @@ int main(void) {
 					}
 					cont =j;
 					
-					// Limpiar arreglo de strings
+					// Limpiar el resto del arreglo de strings
 					while( j<i ) {
 						arg[j]= (char *) calloc(20, sizeof(char));
 						arg[j]= 0x00;
@@ -173,16 +174,21 @@ int main(void) {
 					
 					if(execvp(arg[0], arg)==-1){printf( "error\n"); }
 
-				}else{
+				}else{ // Para el operador de tuberia
 					int sfd;
+					
+					// Crear archivo "pipe"
 					int rfd= open ("pipe",O_CREAT| O_TRUNC |O_RDWR, S_IRWXU);
 					
 					sfd= dup(STDOUT_FILENO);
+					
 					if(dup2(rfd, STDOUT_FILENO)== -1) {printf("error\n");}
+					// escribir el resultado del comado en el archivo "pipe"
 					close(rfd);
 
-					pid2 = fork();
+					pid2 = fork(); // Crea otro proceso
 					if(!pid2){
+						// primer proceso hijo ejecuta el primer comando
 						if(execvp(arg[0], arg)==-1){printf( "error\n"); exit(EXIT_FAILURE);}	
 					}
 					wait(NULL);
@@ -191,6 +197,8 @@ int main(void) {
 					j=0;
 					token = strtok(str2, " ");
 					token = strtok(NULL, " ");
+					
+					// guarda cada palabra del segundo comando en el areglo de string
 					while( token != NULL ) {
 						arg[j]= (char *) calloc(20, sizeof(char));
 						strcpy(arg[j], token);
@@ -202,6 +210,7 @@ int main(void) {
 					strcpy(arg[j], "pipe");
 					j++;
 					
+					// Limpiar el resto del arreglo de strings
 					while( j<i ) {
 						arg[j]= (char *) calloc(20, sizeof(char));
 						arg[j]= 0x00;
@@ -210,7 +219,9 @@ int main(void) {
 					//
 					
 					dup2(sfd, STDOUT_FILENO);
+					// escribir el resultado del segundo comado en la terminal
 	
+					// segundo proceso hijo ejecuta el segundo comando
 					if(execvp(arg[0], arg)==-1){printf( "error\n"); exit(EXIT_FAILURE);}
 					
 				}
