@@ -23,9 +23,11 @@ int main(void) {
 		}
 
 		if(pid) { // Parent
+			// El proceso padre leer los comando a ejecutar y los manda al proceso hijo
+			
 			close(fd[0]);
 				
-			fgets(string, 20, stdin);
+			fgets(string, 20, stdin); // leer comando a ejecutar
 			
 			if(strcmp(string, "salir\n")==0){ // termina programa
 				kill(pid, SIGKILL);
@@ -38,16 +40,19 @@ int main(void) {
 			wait(NULL);
 				
 		} else { // Child
+			// El proceso hijo ejecuta el comando usando la funcion execvp()
+
 			close(fd[1]);
 
-			read(fd[0], readbuffer, sizeof(readbuffer));
+			read(fd[0], readbuffer, sizeof(readbuffer)); // recibe comando
 			
 			char *nstr= strtok(readbuffer, "\n");
 			
 			//
 			
-			char *arg[21]={
-				NULL, NULL
+			char *arg[21]={ // Crear arreglo de string vacio
+				NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+				NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 			};
 			
 			
@@ -58,10 +63,10 @@ int main(void) {
 			//
 
 			//
-			//detecta operacion
+			//detecta operacion y si encuentra una operacion separa los comandos en dos strings diferentes
 			strcpy(nstr2,nstr);
 			str2= strstr(nstr2, "&&");
-			if(str2!=NULL){
+			if(str2!=NULL){ 
 				oper=1;
 				str1= strtok(nstr, "&&");
 
@@ -79,7 +84,7 @@ int main(void) {
 					}
 				}
 			}
-			if(oper==0){ strcpy(str1, nstr); }
+			if(oper==0){ strcpy(str1, nstr); } // si no ecuentra
 			//
 			
 			//
