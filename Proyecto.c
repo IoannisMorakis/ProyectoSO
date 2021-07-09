@@ -4,9 +4,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-/* #include <sys/types.h> */
-
-
 
 
 int main(void) {
@@ -15,7 +12,6 @@ int main(void) {
 	char string[22];
 	char readbuffer[26]; 
         
-
 
 	while(1){
 		fd=(int*) calloc(2, sizeof(int));
@@ -28,13 +24,10 @@ int main(void) {
 
 		if(pid) { // Parent
 			close(fd[0]);
-			
 				
 			fgets(string, 20, stdin);
-
 			
 			if(strcmp(string, "salir\n")==0){ // termina programa
-				
 				kill(pid, SIGKILL);
 				break;
 			}else{
@@ -50,12 +43,11 @@ int main(void) {
 			read(fd[0], readbuffer, sizeof(readbuffer));
 			
 			char *nstr= strtok(readbuffer, "\n");
-
+			
 			//
 			
 			char *arg[21]={
 				NULL, NULL
-				
 			};
 			
 			
@@ -101,7 +93,7 @@ int main(void) {
 				token = strtok(NULL, " ");
 				i++;
 			}
-
+			
 			
 			//
 			if(oper==0){
@@ -109,7 +101,6 @@ int main(void) {
 
 			}
 			else{
-
 				//
 				pid_t pid2;
 				int j, cont; 
@@ -134,7 +125,6 @@ int main(void) {
 						
 						while( j<i ) {
 							arg[j]= (char *) calloc(20, sizeof(char));
-							
 							arg[j]= 0x00;
 							j++;	
 						}
@@ -146,7 +136,7 @@ int main(void) {
 				}
 				else if(oper==2){
 					if(execvp(arg[0], arg)==-1){printf( "error\n"); }
-
+					
 					//
 					j=0;
 					token = strtok(str2, " ");
@@ -168,7 +158,6 @@ int main(void) {
 					if(execvp(arg[0], arg)==-1){printf( "error\n"); }
 
 				}else{
-					
 					int sfd;
 					int rfd= open ("pipe",O_CREAT| O_TRUNC |O_RDWR, S_IRWXU);
 					
@@ -205,16 +194,20 @@ int main(void) {
 					//
 					
 					dup2(sfd, STDOUT_FILENO);
+	
 					if(execvp(arg[0], arg)==-1){printf( "error\n"); exit(EXIT_FAILURE);}
+					
 				}
 				
+				
+
 			}
 			//
-			
 			
 			exit(EXIT_SUCCESS);
 		
 		}
+
 	}
 	exit(EXIT_SUCCESS);
 }
