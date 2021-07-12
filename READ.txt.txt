@@ -1,0 +1,9 @@
+Integrantes:
+Ioannis Morakis 24105182
+Sonia Nahit 
+
+Pasos para compilar:
+~$ make
+
+Pasos ejecutar el proyecto:
+~$ ./Proyecto
